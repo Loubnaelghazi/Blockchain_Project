@@ -12,9 +12,13 @@ contract PatientRecords {
 
     // Définir la structure pour un patient
     struct Patient {
-        string name;
-        address walletAddress;
-        uint256 recordCount; // Compteur pour suivre le nombre de dossiers médicaux
+        string name; // Nom du patient
+        address walletAddress; // Adresse Ethereum du patient
+        uint256 recordCount; // Compteur de dossiers médicaux
+        string contactInfo; // Contact du patient (email ou téléphone)
+        string insuranceDetails; // Détails de l'assurance
+        string[] allergies; // Liste des allergies
+        bool hasChronicConditions; // Indique si le patient a des maladies chroniques
     }
 
     // Mappage d'adresse à Patient
@@ -27,14 +31,24 @@ contract PatientRecords {
     address[] private patientAddresses;
 
     // Enregistrer un patient
-    function registerPatient(string memory _name) public {
+    function registerPatient(
+        string memory _name,
+        string memory _contactInfo,
+        string memory _insuranceDetails,
+        string[] memory _allergies,
+        bool _hasChronicConditions
+    ) public {
         require(bytes(_name).length > 0, "Le nom est obligatoire");
         require(bytes(patients[msg.sender].name).length == 0, "Patient deja enregistre");
 
         patients[msg.sender] = Patient({
             name: _name,
             walletAddress: msg.sender,
-            recordCount: 0 // Initialiser le compteur de dossiers à 0
+            recordCount: 0, // Initialiser le compteur de dossiers à 0
+            contactInfo: _contactInfo,
+            insuranceDetails: _insuranceDetails,
+            allergies: _allergies,
+            hasChronicConditions: _hasChronicConditions
         });
 
         patientAddresses.push(msg.sender);
@@ -77,12 +91,25 @@ contract PatientRecords {
     }
 
     // Récupérer les informations d'un patient
-    function getPatientInfo() public view returns (string memory, address, uint256) {
+    function getPatientInfo() public view returns (
+        string memory, 
+        address, 
+        uint256, 
+        string memory, 
+        string memory, 
+        string[] memory, 
+        bool
+    ) {
         require(bytes(patients[msg.sender].name).length > 0, "Patient non enregistre");
+        Patient memory patient = patients[msg.sender];
         return (
-            patients[msg.sender].name,
-            patients[msg.sender].walletAddress,
-            patients[msg.sender].recordCount
+            patient.name,
+            patient.walletAddress,
+            patient.recordCount,
+            patient.contactInfo,
+            patient.insuranceDetails,
+            patient.allergies,
+            patient.hasChronicConditions
         );
     }
 

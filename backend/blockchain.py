@@ -1,28 +1,37 @@
 from web3 import Web3
 import json
-
+import os
 class Blockchain:
     def __init__(self):
         # Connexion à Ganache (localhost)
         self.web3 = Web3(Web3.HTTPProvider("http://127.0.0.1:7545"))
-        
+      
+        current_dir = os.path.dirname(__file__)
+        file_path = os.path.join(current_dir, "../build/contracts/PatientRecords.json")
         # Vérification de la connexion
         if not self.web3.is_connected():
             raise ConnectionError("Impossible de se connecter à Ganache.")
         
         self.web3.eth.default_account = self.web3.eth.accounts[0]
 
-        with open("../compiled_contracts/contractPatient.json", "r") as file:
+
+        with open(file_path, "r") as file:
             contract_info = json.load(file)
-            self.abi = contract_info["contracts"]["contractPatient.sol"]["PatientRecords"]["abi"]
+            self.abi = contract_info["abi"]
         
-        self.contract_address = "0xA67aD8BfB9FBC17BD2931575804f4391Eeec31C3"
+        self.contract_address = "0xA69002AbDd7FA9c6f01903558680993e09801bD0"
         self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.abi)
 
-    def register_patient(self, name):
+    def register_patient(self, name, contact_info, insurance_details, allergies, has_chronic_conditions):
         try:
             print(f"Envoi de la transaction pour enregistrer le patient : {name}")
-            tx_hash = self.contract.functions.registerPatient(name).transact()
+            tx_hash = self.contract.functions.registerPatient(
+                name, 
+                contact_info, 
+                insurance_details, 
+                allergies, 
+                has_chronic_conditions
+            ).transact()
             print(f"Transaction envoyée. Hash : {tx_hash}")
             tx_receipt = self.web3.eth.wait_for_transaction_receipt(tx_hash)
             print(f"Transaction confirmée dans le bloc : {tx_receipt['blockNumber']}")

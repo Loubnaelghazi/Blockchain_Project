@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <script type="module" src="index.js"></script>
+
+</head>
+<body>
+    <h1>Blockchain Médicale - Gestion des Patients</h1>
+    <button id="connect">Connect to Metamask</button>
+    <br><br>
+    <input type="text" id="patientName" placeholder="Nom">
+    <button id="createPatient">Créer Patient</button>
+
+    <script>
+        let web3;
+        let contract;
+
+        const contractAddress = "0xYourContractAddress";
+        const contractABI = [...]; // Remplacez avec l'ABI
+
+        document.getElementById('connect').addEventListener('click', async () => {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                await ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await web3.eth.getAccounts();
+                console.log("Connecté à l'adresse :", accounts[0]);
+
+                // Initialisez le contrat
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+            } else {
+                alert("Metamask n'est pas détecté");
+            }
+        });
+
+        document.getElementById('createPatient').addEventListener('click', async () => {
+            const name = document.getElementById('patientName').value;
+            const accounts = await web3.eth.getAccounts();
+            try {
+                await contract.methods
+                    .createPatient(name)
+                    .send({ from: accounts[0] });
+                alert("Patient créé avec succès !");
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de la création du patient.");
+            }
+        });
+    </script>
+</body>
+</html>
