@@ -1,10 +1,9 @@
 from PyQt5.QtWidgets import QApplication
-from frontend.main import BlockchainApp
+from frontend.main import AuditInterface
 
 if __name__ == "__main__":
-    import sys
-    app = QApplication(sys.argv)
-    window = BlockchainApp()
+    app = QApplication([])
+    window = AuditInterface()
     window.show()
-    sys.exit(app.exec_())
+    app.exec_()
 
